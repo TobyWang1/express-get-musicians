@@ -11,7 +11,7 @@ const { seedMusician, seedBand } = require("./seedData");
 const { describe, it, expect, beforeAll, afterAll } = require('@jest/globals')
 
 
-describe('./musicians endpoint', () => {
+describe('Endpoint tests', () => {
     beforeAll(async () => {
         // Re-sync the database before running tests
         await db.sync({ force: true });
