@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Musician } = require('../models/index');
+const { check, validationResult } = require('express-validator');
 
 router.get('/musicians', async (req, res) => {
     try {
@@ -30,21 +31,23 @@ router.get('/musicians/:id', async (req, res) => {
     }
 });
 
-router.post('/musicians/add', async (req, res) => {
-    try {
-        if (!req.body) {
-            return res.status(400).json({ message: "Request body is missing" });
-        }
+router.post('/musicians/add', [
+    check('name').notEmpty().trim().withMessage('Name is required'),
+    check('name').isLength({ min: 2, max: 20 }).withMessage('Name should have 2-20 characters'),
+    check('instrument').notEmpty().trim().withMessage('Instrument is required'),
+    check('instrument').isLength({ min: 2, max: 20 }).withMessage('Instrument should have 2-20 characters'),
+] ,async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
 
+    try {
         const musician = await Musician.create(req.body);
         res.status(201).json(musician);
     } catch (error) {
         console.error(error);
-        if (error instanceof ValidationError) {
-            res.status(400).json({ message: "Invalid musician data" });
-        } else {
-            res.status(500).json({ message: "Internal Server Error" });
-        }
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 })
 

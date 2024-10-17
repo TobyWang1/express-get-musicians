@@ -47,6 +47,72 @@ describe('Endpoint tests', () => {
         });
     });
 
+    describe('POST /musicians/add', () => {
+        it('should return a 201 status and the newly added musician', async () => {
+            const newMusician = {
+                name: 'John Doe',
+                instrument: 'Guitar'
+            };
+    
+            const response = await request(app)
+                .post('/musicians/add')
+                .send(newMusician);
+    
+            // Check status code
+            expect(response.statusCode).toBe(201);
+    
+            // Check if the response contains the newly added musician
+            expect(response.body.name).toBe(newMusician.name);
+            expect(response.body.instrument).toBe(newMusician.instrument);
+        });
+    
+        it('should return a 400 status if the request body is missing required fields', async () => {
+            const response = await request(app)
+                .post('/musicians/add')
+                .send({
+                    name: 'John Doe'
+                });
+    
+            // Check status code
+            expect(response.statusCode).toBe(400);
+    
+            // Check if the response contains the validation error
+            expect(response.body.errors).toBeDefined();
+        });
+    });
+
+    describe('PUT /musicians/update/:id', () => {
+        it('should return a 200 status and the updated musician', async () => {
+            const updatedMusician = {
+                name: 'Jane Doe',
+                instrument: 'Piano'
+            };
+    
+            const response = await request(app)
+                .put('/musicians/update/1')
+                .send(updatedMusician);
+    
+            // Check status code
+            expect(response.statusCode).toBe(200);
+    
+            // Check if the response contains the updated musician
+            expect(response.body.name).toBe(updatedMusician.name);
+            expect(response.body.instrument).toBe(updatedMusician.instrument);
+        });
+    
+        it('should return a 404 status if the musician is not found', async () => {
+            const response = await request(app)
+                .put('/musicians/update/100')
+                .send({
+                    name: 'Jane Doe',
+                    instrument: 'Piano'
+                });
+    
+            // Check status code
+            expect(response.statusCode).toBe(404);
+        });
+    });
+
     describe("GET /bands", () => {
         it("should return a 200 status and all bands", async () => {
             const response = await request(app).get("/bands");
