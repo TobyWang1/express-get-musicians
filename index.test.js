@@ -111,6 +111,20 @@ describe('Endpoint tests', () => {
             // Check status code
             expect(response.statusCode).toBe(404);
         });
+
+        it('should return a 400 status if the request body is missing required fields', async () => {
+            const response = await request(app)
+                .put('/musicians/update/1')
+                .send({
+                    name: 'Jane Doe'
+                });
+    
+            // Check status code
+            expect(response.statusCode).toBe(400);
+    
+            // Check if the response contains the validation error
+            expect(response.body.errors).toBeDefined();
+        });
     });
 
     describe("GET /bands", () => {
