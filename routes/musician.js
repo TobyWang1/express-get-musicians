@@ -51,7 +51,17 @@ router.post('/musicians/add', [
     }
 })
 
-router.put('/musicians/update/:id', async (req, res) => {
+router.put('/musicians/update/:id', [
+    check('name').notEmpty().trim().withMessage('Name is required'),
+    check('name').isLength({ min: 2, max: 20 }).withMessage('Name should have 2-20 characters'),
+    check('instrument').notEmpty().trim().withMessage('Instrument is required'),
+    check('instrument').isLength({ min: 2, max: 20 }).withMessage('Instrument should have 2-20 characters'),
+] ,async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
         const musician = await Musician.findByPk(req.params.id);
         if (musician) {
